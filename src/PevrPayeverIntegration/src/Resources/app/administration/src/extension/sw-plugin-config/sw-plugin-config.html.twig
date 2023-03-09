@@ -1,0 +1,37 @@
+{% block sw_plugin_config_actions_save %}
+<sw-button :isLoading="isLoading"
+           class="sw-plugin-config__set-sandbox-action"
+           @click.prevent="setSandboxApiKeys"
+           v-if="namespace === 'PevrPayeverIntegration'">
+    {{ $tc('payever-plugin-config.setApi.buttonTitle') }}
+</sw-button>
+<sw-button :isLoading="isLoading"
+           class="sw-plugin-config__save-action"
+           @click.prevent="onSync"
+           :disabled="isLoading || !clientSecretFilled || !clientIdFilled || !businessIdFilled"
+           v-if="namespace === 'PevrPayeverIntegration'">
+    {{ $tc('payever-plugin-config.synchronize.buttonTitle') }}
+</sw-button>
+<sw-button :isLoading="isLoading"
+           class="sw-plugin-config__download_log-action"
+           @click.prevent="downloadLog"
+           :disabled="isLoading"
+           v-if="namespace === 'PevrPayeverIntegration'">
+    {{ $tc('payever-plugin-config.downloadLog.buttonTitle') }}
+</sw-button>
+{% parent %}
+{% endblock %}
+{% block sw_system_config %}
+<sw-alert variant="info"  v-if="namespace === 'PevrPayeverIntegration'">
+    {{ $tc('payever-plugin-config.support.message') }}
+    <br><br>
+    <sw-button  :isLoading="isLoading"
+                class="sw-system-config_support"
+                @click.prevent="support" >
+        {{ $tc('payever-plugin-config.support.buttonTitle') }}
+    </sw-button>
+</sw-alert>
+<br><br>
+{% parent %}
+{% endblock %}
+

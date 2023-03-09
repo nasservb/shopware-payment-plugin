@@ -1,0 +1,6 @@
+{
+    "payever": {
+        "paymentCancelled": "Payment has been canceled",
+        "paymentFailure": "Payment has been failed"
+    }
+}

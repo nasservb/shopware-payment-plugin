@@ -1,0 +1,58 @@
+{% sw_extends '@Storefront/storefront/page/checkout/_page.html.twig' %}
+
+{% block page_checkout_container %}
+    <div class="checkout">
+        <div class="checkout-container">
+            <div class="checkout-main">
+                <iframe
+                    sandbox="allow-same-origin allow-forms allow-top-navigation allow-scripts allow-popups allow-modals allow-popups-to-escape-sandbox"
+                    id="payever_iframe"
+                    width="100%"
+                    src="{{ iframeUrl }}"
+                    style="border:none; min-height: 600px;">
+                </iframe>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function sendCheckoutNewScrollOffset() {
+            var iframe = document.getElementById('payever_iframe');
+            if (iframe) {
+                iframe.contentWindow.postMessage(
+                    {
+                        'event': 'sendPayeverCheckoutScrollOffset',
+                        'scrollTop': window.pageYOffset || document.documentElement.scrollTop,
+                        'offsetTop': iframe.offsetTop,
+                        'windowHeight': window.innerHeight
+                    }
+                    , "*");
+            }
+        }
+
+        if (window.addEventListener) {
+            window.addEventListener("message", onMessagePayever, false);
+            window.addEventListener('scroll', sendCheckoutNewScrollOffset, false);
+            window.addEventListener('resize', sendCheckoutNewScrollOffset, false);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent("onmessage", onMessagePayever, false);
+            window.attachEvent('onscroll', sendCheckoutNewScrollOffset, false);
+            window.attachEvent('onresize', sendCheckoutNewScrollOffset, false);
+        }
+
+        function onMessagePayever(event) {
+            var payeverIframe = document.getElementById('payever_iframe');
+            if (event && event.data) {
+                switch (event.data.event) {
+                    case 'payeverCheckoutHeightChanged':
+                        payeverIframe.style.height = Math.max(0, parseInt(event.data.value));
+                        break;
+                    case 'payeverCheckoutScrollOffsetRequested':
+                        sendCheckoutNewScrollOffset();
+
+                }
+            }
+        }
+    </script>
+
+{% endblock %}

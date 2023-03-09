@@ -1,0 +1,559 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter key="export.limit">5</parameter>
+    </parameters>
+    <services>
+        <service id="Payever\PayeverPayments\Service\Setting\SettingsService" public="true">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+        </service>
+        <service id="payever.config" class="Payever\PayeverPayments\Service\Setting\PayeverSettingGeneralStruct">
+            <factory service="Payever\PayeverPayments\Service\Setting\SettingsService" method="getSettings"/>
+        </service>
+
+        <!-- Entities -->
+        <service id="Payever\PayeverPayments\SynchronizationQueue\SynchronizationQueueDefinition">
+            <tag name="shopware.entity.definition" entity="payever_synchronization_queue"/>
+        </service>
+
+        <service id="Payever\PayeverPayments\HiddenMethods\HiddenMethodsDefinition">
+            <tag name="shopware.entity.definition" entity="payever_hidden_methods"/>
+        </service>
+
+        <service id="Payever\PayeverPayments\OrderTotals\OrderTotalsDefinition">
+            <tag name="shopware.entity.definition" entity="payever_order_totals"/>
+        </service>
+
+        <service id="Payever\PayeverPayments\OrderItems\OrderItemsDefinition">
+            <tag name="shopware.entity.definition" entity="payever_order_items"/>
+        </service>
+
+        <!-- Helpers -->
+        <service id="Payever\PayeverPayments\Service\Helper\SalesChannelContextHelper">
+            <argument type="service" id="request_stack"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Helper\ConfigHelper">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Helper\ConnectionHelper">
+            <argument type="service" id="Doctrine\DBAL\Connection" />
+        </service>
+        <service id="Payever\PayeverPayments\Service\Helper\SeoHelper"/>
+
+        <!-- Twig -->
+        <service id="Payever\PayeverPayments\Twig\TemplateDataExtension">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+
+            <tag name="twig.extension"/>
+        </service>
+
+        <!-- SDK -->
+        <service id="Payever\PayeverPayments\Service\PayeverApi\Plugins\PluginRegistryInfoProvider">
+            <argument type="service" id="Shopware\Core\Framework\Plugin\PluginService" />
+            <argument type="service" id="router.default" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+            <argument type="service" id="uri_signer" />
+            <argument>%kernel.shopware_version%</argument>
+        </service>
+        <service id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\Plugins\PluginRegistryInfoProvider"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\Core\Authorization\TokenList"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\PayeverApi\ProcessorFactory" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument type="service" id="Payever\ExternalIntegration\ThirdParty\Action\ActionHandlerPool"/>
+        </service>
+
+        <service id="Payever\ExternalIntegration\Payments\PaymentsApiClient" public="true">
+            <factory service="Payever\PayeverPayments\Service\PayeverApi\ClientFactory" method="getPaymentsApiClient" />
+        </service>
+        <service id="Payever\ExternalIntegration\Inventory\InventoryApiClient" public="true">
+            <factory service="Payever\PayeverPayments\Service\PayeverApi\ClientFactory" method="getInventoryApiClient" />
+        </service>
+        <service id="Payever\ExternalIntegration\Plugins\PluginsApiClient">
+            <factory service="Payever\PayeverPayments\Service\PayeverApi\ClientFactory" method="getPluginsApiClient"/>
+        </service>
+
+        <service id="Payever\ExternalIntegration\Core\Lock\LockInterface" class="Payever\ExternalIntegration\Core\Lock\FileLock">
+            <argument>%kernel.cache_dir%</argument>
+        </service>
+
+        <service id="Payever\PayeverPayments\Service\PayeverApi\Plugins\PluginCommandExecutor">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+        </service>
+        <service id="Payever\ExternalIntegration\Plugins\Command\PluginCommandManager">
+            <argument type="service" id="Payever\ExternalIntegration\Plugins\PluginsApiClient" />
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\Plugins\PluginCommandExecutor" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger" />
+        </service>
+
+        <service id="Payever\PayeverPayments\Service\PayeverPayment">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="router.default"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\HiddenMethodService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\Plugins\PluginRegistryInfoProvider"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\Lock\LockInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Item\Calculator"/>
+            <tag name="shopware.payment.method.async" />
+        </service>
+        <service id="Payever\PayeverPayments\Service\Logger" class="Monolog\Logger">
+            <factory service="Shopware\Core\Framework\Log\LoggerFactory" method="createRotating"/>
+            <argument type="string">payever</argument>
+        </service>
+        <service id="Payever\PayeverPayments\Service\PayeverApi\Core\Authorization\TokenList">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Item\Calculator" />
+
+        <service id="Payever\PayeverPayments\Service\Payment\PaymentOptionsService" public="true">
+            <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider" />
+            <argument type="service" id="payment_method.repository" />
+            <argument type="service" id="Payever\ExternalIntegration\Payments\PaymentsApiClient"/>
+            <argument type="service" id="country.repository"/>
+            <argument type="service" id="currency.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\OrderTotalsManager">
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConnectionHelper"/>
+            <argument type="service" id="order.repository" />
+            <argument type="service" id="payever_order_totals.repository"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\OrderItemsManager">
+            <argument type="service" id="order.repository" />
+            <argument type="service" id="payever_order_items.repository"/>
+            <argument type="service" id="order_line_item.repository" />
+            <argument type="service" id="product.repository" />
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\PaymentActionService">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="order.repository" />
+            <argument type="service" id="order_transaction.repository" />
+            <argument type="service" id="order_delivery.repository" />
+            <argument type="service" id="state_machine_state.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderTotalsManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderItemsManager"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\TransactionStatusService">
+            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="state_machine_state.repository"/>
+            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderTotalsManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderItemsManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument>%kernel.shopware_version%</argument>
+        </service>
+        <service id="Payever\PayeverPayments\EventListener\CheckoutConfirmEventListener">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\HiddenMethodService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Payever\PayeverPayments\EventListener\OrderStateChangeEventListener">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\PaymentActionService" />
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderTotalsManager"/>
+            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Payever\PayeverPayments\EventListener\ProductSaveEventListener">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Payever\PayeverPayments\EventListener\ProductDeleteEventListener">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\HiddenMethodService">
+            <argument type="service" id="session"/>
+            <argument type="service" id="payever_hidden_methods.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\Notification\NotificationHandler">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SalesChannelContextHelper"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\Notification\NotificationRequestProcessor">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\Notification\NotificationHandler"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\Lock\LockInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SalesChannelContextHelper"/>
+        </service>
+
+        <!-- Generators -->
+        <service id="Payever\PayeverPayments\Service\Generator\CustomerGenerator">
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriter" />
+            <argument type="service" id="customer.repository" />
+            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface" />
+            <argument type="service" id="Shopware\Core\Checkout\Customer\CustomerDefinition"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConnectionHelper"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Generator\OrderGenerator">
+            <argument type="service" id="order.repository" />
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory" />
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter" />
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriter" />
+            <argument type="service" id="Shopware\Core\Checkout\Order\OrderDefinition" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConnectionHelper" />
+        </service>
+
+        <!-- FinanceExpress -->
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\CustomerHelper">
+            <argument type="service" id="customer.repository" />
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConnectionHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Generator\CustomerGenerator"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\OrderHelper">
+            <argument type="service" id="order_transaction.repository" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConnectionHelper" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Generator\OrderGenerator"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\SuccessHandler">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverPayment"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\CustomerHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\OrderHelper"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\Lock\LockInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\FailureHandler">
+            <argument type="service" id="product.repository" />
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverPayment"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\NotificationRequestProcessor" class="Payever\PayeverPayments\Service\Payment\Notification\NotificationRequestProcessor">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\NotificationHandler"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\Lock\LockInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SalesChannelContextHelper"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Payment\FinanceExpress\NotificationHandler">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverPayment"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\CustomerHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\OrderHelper"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\Lock\LockInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SalesChannelContextHelper"/>
+        </service>
+
+        <!-- Controllers -->
+        <service id="Payever\PayeverPayments\Controller\SynchronizationController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\PaymentOptionsService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\PaymentDetailsController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\PaymentTotalsController" public="true">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderTotalsManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\OrderItemsController" public="true">
+            <argument type="service" id="order.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OrderItemsManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\AllowedActionsController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\PaymentActionController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\PaymentActionService" />
+            <argument type="service" id="order_transaction.repository" />
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\NotificationController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\Notification\NotificationRequestProcessor"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\CancelPaymentController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\FinalizeController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverPayment"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="order.repository" />
+            <argument type="service" id="router"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\IframeController" public="true">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\PluginCommandController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\ScheduledTask\ExecutePluginCommandsTaskHandler"/>
+            <argument type="service" id="uri_signer"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\PluginController" public="true">
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Symfony\Component\HttpFoundation\Session\SessionInterface"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\ProductsAndInventoryController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SubscriptionManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\ExportManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\ImportManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+        <service id="Payever\PayeverPayments\Controller\FinanceExpressController" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\SuccessHandler"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\FailureHandler"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\FinanceExpress\NotificationRequestProcessor"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <!-- Message Queue -->
+        <service id="Payever\PayeverPayments\Messenger\ExportProducer">
+            <argument type="service" id="messenger.bus.shopware"/>
+        </service>
+        <service id="Payever\PayeverPayments\Messenger\ExportBatchMessageHandler">
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\ExportManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <!-- Transformers -->
+        <service id="Payever\PayeverPayments\Service\Transformer\ProductTransformer" public="true">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\CategoryManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\GalleryManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\PriceManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\ShippingManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\OptionManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\ManufacturerManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\VisibilityManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SeoHelper"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Transformer\InventoryTransformer" public="true">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+        </service>
+
+        <!-- Management services -->
+        <service id="Payever\PayeverPayments\Service\Management\SubscriptionManager" public="true">
+            <argument type="service" id="router.default"/>
+            <argument type="service" id="Payever\ExternalIntegration\Core\PseudoRandomStringGenerator"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationQueueManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\ExportManager">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\ProductTransformer"/>
+            <argument type="service" id="Payever\PayeverPayments\Messenger\ExportProducer"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SubscriptionManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\ImportManager">
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SubscriptionManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\SynchronizationManager">
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ProcessorFactory"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationQueueManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SubscriptionManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\ProductTransformer"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\InventoryTransformer"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\SynchronizationQueueManager">
+            <argument type="service" id="payever_synchronization_queue.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\CategoryManager" public="true">
+            <argument type="service" id="category.repository"/>
+            <argument type="service" id="cms_page.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\SeoHelper"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\GalleryManager">
+            <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
+            <argument type="service" id="media.repository"/>
+            <argument type="service" id="product_media.repository"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\PriceManager" public="true">
+            <argument type="service" id="currency.repository"/>
+            <argument type="service" id="rule.repository"/>
+            <argument type="service" id="tax.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\PayeverApi\ClientFactory"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\ShippingManager"/>
+        <service id="Payever\PayeverPayments\Service\Management\OptionManager" public="true">
+            <argument type="service" id="property_group.repository"/>
+            <argument type="service" id="property_group_translation.repository"/>
+            <argument type="service" id="property_group_option.repository"/>
+            <argument type="service" id="property_group_option_translation.repository"/>
+            <argument type="service" id="product_configurator_setting.repository"/>
+            <argument type="service" id="product_option.repository"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\ManufacturerManager">
+            <argument type="service" id="product_manufacturer.repository"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\Management\VisibilityManager">
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="product_visibility.repository"/>
+        </service>
+
+        <service id="Payever\ExternalIntegration\Core\PseudoRandomStringGenerator" public="true"/>
+
+        <!-- Action Handlers -->
+        <service id="Payever\ExternalIntegration\ThirdParty\Action\ActionHandlerPool">
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\CreateProduct"/>
+            </call>
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\UpdateProduct"/>
+            </call>
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\RemoveProduct"/>
+            </call>
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\SetInventory"/>
+            </call>
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\AddInventory"/>
+            </call>
+            <call method="registerActionHandler">
+                <argument type="service" id="Payever\PayeverPayments\Service\ActionHandler\SubtractInventory"/>
+            </call>
+        </service>
+
+        <service id="Payever\PayeverPayments\Service\ActionHandler\UpdateProduct" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\ProductTransformer"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\ActionHandler\CreateProduct" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\ProductTransformer"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\ActionHandler\RemoveProduct" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\ProductTransformer"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\ActionHandler\SetInventory" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\InventoryTransformer"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\ActionHandler\AddInventory" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\InventoryTransformer"/>
+        </service>
+        <service id="Payever\PayeverPayments\Service\ActionHandler\SubtractInventory" public="true">
+            <argument type="service" id="Payever\PayeverPayments\Service\Transformer\InventoryTransformer"/>
+        </service>
+
+        <!-- scheduled tasks -->
+
+        <service id="Payever\PayeverPayments\ScheduledTask\ExecutePluginCommandsTask">
+            <tag name="shopware.scheduled.task" />
+        </service>
+        <service id="Payever\PayeverPayments\ScheduledTask\ExecutePluginCommandsTaskHandler">
+            <argument type="service" id="scheduled_task.repository" />
+            <argument type="service" id="Payever\ExternalIntegration\Plugins\PluginsApiClient" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+            <argument type="service" id="Payever\ExternalIntegration\Plugins\Command\PluginCommandManager" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger" />
+            <tag name="messenger.message_handler" />
+        </service>
+        <service id="Payever\PayeverPayments\ScheduledTask\SynchronizationQueueTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+        <service id="Payever\PayeverPayments\ScheduledTask\SynchronizationQueueTaskHandler" public="true">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationQueueManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Management\SynchronizationManager"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Helper\ConfigHelper"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <service id="Payever\PayeverPayments\ScheduledTask\OrdersAutoCancellingTask">
+            <tag name="shopware.scheduled.task" />
+        </service>
+        <service id="Payever\PayeverPayments\ScheduledTask\OrdersAutoCancellingTaskHandler">
+            <argument type="service" id="scheduled_task.repository" />
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\TransactionStatusService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Payment\PaymentOptionsService"/>
+            <argument type="service" id="Payever\PayeverPayments\Service\Logger" />
+            <tag name="messenger.message_handler" />
+        </service>
+        <service id="Payever\PayeverPayments\Commands\SetApiVersionCommand">
+            <argument type="service" id="Payever\PayeverPayments\Service\Setting\SettingsService" />
+            <tag name="console.command" />
+        </service>
+
+        <!-- snippets -->
+        <service id="Payever\PayeverPayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
+        <service id="Payever\PayeverPayments\Resources\snippet\de_DE\SnippetFile_de_DE" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
+    </services>
+</container>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/unit/bootstrap.php"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false">
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">__PLUGIN_SOURCE_PATH__/src</directory>
+            <exclude>
+                <directory>__PLUGIN_SOURCE_PATH__/src/Resources</directory>
+                <directory>__PLUGIN_SOURCE_PATH__/src/Migration</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <testsuites>
+        <testsuite name="main">
+            <directory>./tests/unit</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <const name="SHOPWARE_SOURCE_PATH" value="__SHOPWARE_SOURCE_PATH__"/>
+        <const name="PLUGIN_SOURCE_PATH" value="__PLUGIN_SOURCE_PATH__"/>
+    </php>
+</phpunit>

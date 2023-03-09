@@ -1,0 +1,6 @@
+{
+    "payever": {
+        "paymentCancelled": "Zahlung wurde storniert",
+        "paymentFailure": "Zahlung ist fehlgeschlagen"
+    }
+}

@@ -1,0 +1,92 @@
+{
+    "payever-order-buttons": {
+        "title": "payever payment",
+        "amountErrorTitle": "Invalid amount",
+        "amountErrorMessage": "Invalid amount",
+        "shippingMethod": "Shipping costs",
+        "paid": "Paid",
+        "captured": "Captured",
+        "refunded": "Refunded",
+        "cancelled": "Cancelled",
+        "shipping_goods": {
+            "buttonTitle": "Ship goods",
+            "successTitle": "payever Payment",
+            "successMessage": "Shipping goods has been processed successfully.",
+            "errorTitle": "Shipping goods hasn't been processed successfully.",
+            "amount": "Shipping amount"
+        },
+        "cancel": {
+            "buttonTitle": "Cancel",
+            "successTitle": "payever Payment",
+            "successMessage": "Cancel has been processed successfully.",
+            "errorTitle": "Cancel hasn't been processed successfully.",
+            "amount": "Amount for Partial Cancel. For full cancel, enter 0 or leave blank."
+        },
+        "refund": {
+            "buttonTitle": "Refund",
+            "successTitle": "payever Payment",
+            "successMessage": "Refund has been processed successfully.",
+            "errorTitle": "Refund hasn't been processed successfully.",
+            "amount": "Refund amount"
+        },
+        "refundItem": {
+            "title": "Refund items",
+            "buttonTitle": "Refund Items",
+            "successTitle": "payever Payment",
+            "successMessage": "Item Refund has been processed successfully.",
+            "errorTitle": "Item Refund hasn't been processed successfully.",
+            "quantity": "Refund Quantity"
+        },
+        "shippingGoods": {
+            "title": "Shipping goods",
+            "buttonTitle": "Ship goods",
+            "successTitle": "payever Payment",
+            "successMessage": "Shipping goods has been processed successfully.",
+            "errorTitle": "Shipping goods hasn't been processed successfully.",
+            "quantity": "Shipping Quantity"
+        },
+        "cancelItem": {
+            "title": "Cancel items",
+            "buttonTitle": "Cancel items",
+            "successTitle": "payever Payment",
+            "successMessage": "Cancelling has been processed successfully.",
+            "errorTitle": "Cancelling hasn't been processed successfully.",
+            "quantity": "Cancel Quantity"
+        },
+        "transaction": "Transaction ID",
+        "pan": "PAN",
+        "transactionState": "State"
+    },
+    "payever-plugin-config": {
+        "synchronize": {
+            "buttonTitle": "Synchronize",
+            "successTitle": "Synchronization",
+            "successMessage": "Synchronization has been processed successfully.",
+            "noticeTitle": "Notice",
+            "errorTitle": "Synchronization hasn't been processed successfully.",
+            "wrongCredentials": "Could not synch - please check if the credentials you entered are correct and match the mode (live/sandbox)"
+        },
+        "setApi": {
+            "buttonTitle": "Set up sandbox API Keys",
+            "successTitle": "Success",
+            "successMessage": "You set up sandbox API Keys successfully."
+        },
+        "support": {
+            "buttonTitle": "Need help? Chat with us!",
+            "message": "Our free english and german speaking support is there for you from Monday to Friday, 8am-7pm. If you want to report a specific technical problem, please include your Shopware version and payever plugin version in your message to us, and attach your plugin logs to it."
+        },
+        "downloadLog": {
+            "buttonTitle": "Download log"
+        },
+        "productSynchronization": {
+            "title": "Products Synchronization",
+            "subscriptionEnableTitle": "Enable",
+            "subscriptionDisableTitle": "Disable",
+            "subscriptionFailedTitle": "Unable to perform subscription operation",
+            "subscriptionEnabledSuccessMessage": "Synchronization has been enabled",
+            "subscriptionDisabledSuccessMessage": "Synchronization has been disabled",
+            "exportSuccessMessage": "Products and inventory export has been enqueued",
+            "exportButtonTitle": "Export Shopware products"
+        }
+    }
+}

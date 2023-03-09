@@ -1,0 +1,54 @@
+{
+  "name": "payever/shopware6-integration",
+  "description": "payever integration for Shopware 6",
+  "keywords": [
+    "payever",
+    "payment",
+    "php",
+    "shopware"
+  ],
+  "homepage": "https://getpayever.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "payever GmbH",
+      "homepage": "https://getpayever.com"
+    }
+  ],
+  "version": "v1.21.0",
+  "type": "shopware-platform-plugin",
+  "autoload": {
+    "psr-4": {
+      "Payever\\PayeverPayments\\": "src/"
+    }
+  },
+  "extra": {
+    "shopware-plugin-class": "Payever\\PayeverPayments\\PevrPayeverIntegration",
+    "plugin-icon": "src/Resources/public/plugin.png",
+    "copyright": "(c) by payever GmbH",
+    "label": {
+      "de-DE": "payever Integration für Shopware 6",
+      "en-GB": "payever integration for Shopware 6"
+    },
+    "description": {
+      "de-DE": "Integrieren Sie ganz einfach und kostenlos unser breites Angebot an Zahlarten - wir bieten Rechnungs- und Ratenkauf-Lösungen, Kreditkarten-Zahlungen, Lastschriften, Echtzeit-Überweisungen und PayPal!",
+      "en-GB": "Integrate a variety of payment options with ease free of charge - we're offering invoice  and installment solutions, credit card, direct debit, paypal, wire transfers and instant payments!"
+    },
+    "manufacturerLink": {
+      "de-DE": "https://payever.de/checkout",
+      "en-GB": "https://getpayever.com/checkout"
+    },
+    "supportLink": {
+      "de-DE": "https://support.payever.org/hc/de/articles/360012435820-Shopware-6",
+      "en-GB": "https://support.payever.org/hc/en-us/articles/360012435820-Shopware-6"
+    }
+  },
+  "require": {
+    "ext-json": "*",
+    "payever/sdk-php": "4.4.0",
+    "shopware/core": "^6.0|^6.1|^6.2|^6.3|^6.4"
+  },
+  "replace": {
+      "psr/log": "*"
+  }
+}

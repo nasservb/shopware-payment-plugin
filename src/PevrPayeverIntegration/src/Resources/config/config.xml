@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+    <card>
+        <title>Configuration</title>
+        <title lang="de-DE">Konfiguration</title>
+        <input-field type="bool">
+            <name>isSandbox</name>
+            <label>Enable Sandbox</label>
+            <label lang="de-DE">Sandbox aktivieren</label>
+        </input-field>
+        <input-field type="text">
+            <name>clientId</name>
+            <label>Client ID</label>
+            <label lang="de-DE">Client ID</label>
+            <value>1454_2ax8i5chkvggc8w00g8g4sk80ckswkw0c8k8scss40o40ok4sk</value>
+            <helpText>Payever API Client ID, check your Payever account to get value</helpText>
+            <helpText lang="de-DE">Sie finden die Client ID im payever Konto.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>clientSecret</name>
+            <label>Client Secret</label>
+            <label lang="de-DE">Client Secret</label>
+            <value>22uvxi05qlgk0wo8ws8s44wo8ccg48kwogoogsog4kg4s8k8k</value>
+            <helpText>Payever API Client Secret, check your Payever account to get value</helpText>
+            <helpText lang="de-DE">Sie finden den API Client Secret im payever Konto.</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>businessUuid</name>
+            <label>Business UUID</label>
+            <label lang="de-DE">Business UUID</label>
+            <value>payever</value>
+            <helpText>Your payever Business UUID, check your Payever account to get value.</helpText>
+            <helpText lang="de-DE">Sie finden die Business UUID im payever Konto.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>isIframe</name>
+            <label>Iframe</label>
+            <label lang="de-DE">Iframe</label>
+            <helpText>Use IFrame to integrate Payever Checkout</helpText>
+            <helpText lang="de-DE">Verwenden Sie den iframe Modus um den payever Checkout in Ihren Shop zu integrieren.</helpText>
+        </input-field>
+        <input-field type="single-select">
+            <name>checkoutLanguage</name>
+            <label>Checkout language</label>
+            <label lang="de-DE">Checkout Sprache</label>
+            <options>
+                <option>
+                    <id></id>
+                    <name>Default</name>
+                    <name lang="de-DE">Standard</name>
+                </option>
+                <option>
+                    <id>en</id>
+                    <name>English</name>
+                    <name lang="de-DE">English</name>
+                </option>
+                <option>
+                    <id>de</id>
+                    <name>Deutsch</name>
+                    <name lang="de-DE">Deutsch</name>
+                </option>
+                <option>
+                    <id>es</id>
+                    <name>Español</name>
+                    <name lang="de-DE">Español</name>
+                </option>
+                <option>
+                    <id>no</id>
+                    <name>Norsk</name>
+                    <name lang="de-DE">Norsk</name>
+                </option>
+                <option>
+                    <id>da</id>
+                    <name>Dansk</name>
+                    <name lang="de-DE">Dansk</name>
+                </option>
+                <option>
+                    <id>sv</id>
+                    <name>Svenska</name>
+                    <name lang="de-DE">Svenska</name>
+                </option>
+            </options>
+            <helpText>Checkout interface language</helpText>
+            <helpText lang="de-DE">Checkout Sprache ändern</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>isForceRedirect</name>
+            <label>Force redirect to payment gateway</label>
+            <label lang="de-DE">Umleitung zum Zahlungsgateway erzwingen</label>
+            <helpText>Enable this option to force redirect to payment gateway for appropriate payment options, such as PayPal, Sofort, Santander instalment AT and Santander instalment NL.</helpText>
+            <helpText lang="de-DE">Aktivieren Sie diese Option, um die Umleitung zum Zahlungsgateway für geeignete Zahlungsoptionen wie PayPal, Sofort, Santander-Rate AT und Santander-Rate NL zu erzwingen.</helpText>
+        </input-field>
+    </card>
+    <card>
+        <title>Products and inventory</title>
+        <title lang="de-DE">Produkte und Inventar</title>
+        <input-field type="bool">
+            <name>isProductsSyncEnabled</name>
+            <disabled>true</disabled>
+            <defaultValue>false</defaultValue>
+            <label>Products and inventory synchronization enabled</label>
+            <label lang="de-DE">Produkt- und Inventarsynchronisation aktiviert</label>
+            <helpText>Products and inventory synchronization enabled</helpText>
+            <helpText lang="de-DE">Produkt- und Inventarsynchronisation aktiviert</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>isProductsOutwardSyncEnabled</name>
+            <defaultValue>true</defaultValue>
+            <label>Export changes to payever</label>
+            <label lang="de-DE">Exportieren Sie Änderungen an payever</label>
+            <helpText>Export changes to payever</helpText>
+            <helpText lang="de-DE">Exportieren Sie Änderungen an payever</helpText>
+        </input-field>
+        <input-field type="single-select">
+            <name>productsSyncMode</name>
+            <options>
+                <option>
+                    <id>instant</id>
+                    <name>Instant HTTP Requests</name>
+                    <name lang="de-DE">Sofort bei HTTP-Anfragen</name>
+                </option>
+                <option>
+                    <id>cron</id>
+                    <name>Cron</name>
+                    <name lang="de-DE">Cron</name>
+                </option>
+            </options>
+            <defaultValue>instant</defaultValue>
+            <label>Processing mode</label>
+            <label lang="de-DE">Verarbeitungsmodus</label>
+            <helpText>Processing mode</helpText>
+            <helpText lang="de-DE">Verarbeitungsmodus</helpText>
+        </input-field>
+        <input-field type="text">
+            <name>productsSyncExternalId</name>
+            <label>External ID</label>
+            <label lang="de-DE">Externe ID</label>
+            <helpText>External ID</helpText>
+            <helpText lang="de-DE">Externe ID</helpText>
+        </input-field>
+        <component name="sw-products-and-inventory-toggle-subscription">
+            <name>productsAndInventoryToggleSubscription</name>
+        </component>
+        <component name="sw-products-and-inventory-export">
+            <name>productsAndInventoryExport</name>
+        </component>
+    </card>
+</config>

@@ -1,0 +1,7 @@
+{% block sw_products_and_inventory_toggle_subscription %}
+<sw-button :isLoading="isLoading"
+           class="sw-products-and-inventory-toggle-subscription-button"
+           @click.prevent="toggleSubscription">
+    {{ $tc('payever-plugin-config.productSynchronization.subscriptionEnableTitle') }}
+</sw-button>
+{% endblock %}

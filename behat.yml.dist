@@ -1,0 +1,51 @@
+default:
+  suites:
+    default:
+      filters:
+        tags: "__BEHAT_TAG__"
+      paths:
+        features: "tests/features"
+        bootstrap: "tests/features/bootstrap"
+      contexts:
+        - Payever\Tests\BackendContext
+        - Payever\Tests\FrontendContext
+        - Payever\Tests\PaymentContext
+        - Payever\Tests\PluginContext
+        - Payever\Stub\BehatExtension\Context\StubServerContext
+  extensions:
+    Behat\MinkExtension:
+      base_url: "__BASE_URL__"
+      browser_name: "chrome"
+      sessions:
+        default:
+          selenium2:
+            wd_host: "__SELENIUM_URL__"
+            browser: "chrome"
+            capabilities:
+              extra_capabilities:
+                chromeOptions:
+                  w3c: false
+                  args:
+                    - "--disable-dev-shm-usage"
+    Payever\Stub\BehatExtension\ServiceContainer\PluginsExtension:
+      stub_server:
+        bin_path: "__STUB_SERVER_BIN_PATH__"
+        port: "__STUB_SERVER_PORT__"
+        worker_port: "__STUB_SERVER_WORKER_PORT__"
+        hostname: "__STUB_SERVER_HOSTNAME__"
+      plugin:
+        base_url: "__BASE_URL__"
+        stub_url: "__STUB_URL__"
+        connector_class: __CONNECTOR__
+        cms_directory: "__CMS_DIRECTORY__"
+        backend:
+          username: "__BACKEND_USERNAME__"
+          password: "__BACKEND_PASSWORD__"
+        products_sku:
+          - "OUTWRD-1"
+          - "PROD1"
+          - "PROD2"
+    Bex\Behat\ScreenshotExtension:
+      image_drivers:
+        local:
+          screenshot_directory: "__SCREENSHOT_DIRECTORY__"

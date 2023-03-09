@@ -1,0 +1,92 @@
+{
+    "payever-order-buttons": {
+        "title": "payever Zahlung",
+        "amountErrorTitle": "Invalid amount",
+        "amountErrorMessage": "Invalid amount",
+        "shippingMethod": "Shipping costs",
+        "paid": "Paid",
+        "captured": "Captured",
+        "refunded": "Refunded",
+        "cancelled": "Cancelled",
+        "shipping_goods": {
+            "buttonTitle": "Ware versendet (Capture) ",
+            "successTitle": "payever Zahlung",
+            "successMessage": "Der Warenversand wurde erfolgreich an den Zahlungsdienstleister gemeldet.",
+            "errorTitle": "Der Warenversand konnte nicht an den Zahlungsdienstleister gemeldet werden.",
+            "amount": "Shipping amount"
+        },
+        "cancel": {
+            "buttonTitle": "Komplett stornieren",
+            "successTitle": "payever Zahlung",
+            "successMessage": "Die Stornierung Ihrer Zahlung wurde erfolgreich verarbeitet.",
+            "errorTitle": "Die Stornierung Ihrer Zahlung ist fehlgeschlagen.",
+            "amount": "Betrag für Teilstornierung. Geben Sie zum vollständigen Abbrechen 0 ein oder lassen Sie das Feld leer."
+        },
+        "refund": {
+            "buttonTitle": "Obigen Betrag erstatten",
+            "successTitle": "payever Zahlung",
+            "successMessage": "Die Erstattung Ihrer Zahlung wurde erfolgreich verarbeitet.",
+            "errorTitle": "Die Erstattung Ihrer Zahlung ist fehlgeschlagen.",
+            "amount": "Zu erstattender Betrag"
+        },
+        "refundItem": {
+            "title": "Refund items",
+            "buttonTitle": "Artikel zurückerstatten",
+            "successTitle": "payever Payment",
+            "successMessage": "Artikelrückerstattung wurde erfolgreich verarbeitet.",
+            "errorTitle": "Artikelrückerstattung wurde nicht erfolgreich verarbeitet.",
+            "quantity": "Rückerstattungsmenge"
+        },
+        "shippingGoods": {
+          "title": "Shipping goods",
+          "buttonTitle": "Ship goods",
+          "successTitle": "payever Payment",
+          "successMessage": "Shipping goods has been processed successfully.",
+          "errorTitle": "Shipping goods hasn't been processed successfully.",
+          "quantity": "Shipping Quantity"
+        },
+        "cancelItem": {
+            "title": "Cancel items",
+            "buttonTitle": "Cancel items",
+            "successTitle": "payever Payment",
+            "successMessage": "Cancelling has been processed successfully.",
+            "errorTitle": "Cancelling hasn't been processed successfully.",
+            "quantity": "Cancel Quantity"
+        },
+        "transaction": "Transaction ID",
+        "pan": "PAN",
+        "transactionState": "Status"
+    },
+    "payever-plugin-config": {
+        "synchronize": {
+            "buttonTitle": "Synchronize",
+            "successTitle": "Synchronisierung",
+            "successMessage": "Die Synchronisierung war erfolgreich.",
+            "noticeTitle": "Nachricht",
+            "errorTitle": "Die Synchronisierung ist fehlgeschlagen.",
+            "wrongCredentials": "Synchronisierung fehlgeschlagen - bitte prüfen Sie, ob Ihre Daten stimmig sind und zum Modus passen (Live/Sandbox)"
+        },
+        "setApi": {
+            "buttonTitle": "Sandbox API-Schlüssel eintragen",
+            "successTitle": "Erfolg",
+            "successMessage": "Sandbox API-Schlüssel erfolgreich eintragen"
+        },
+        "support": {
+            "buttonTitle": "Hilfe benötigt? Kontaktiere uns!",
+            "message" : "Unser kostenloser deutsch- und englisch-sprachiger Tech Support ist Montags bis Freitags zwischen 8 und 19 Uhr für dich da. Wenn du ein bestimmtes technisches Problem melden möchtest, erwähne in deiner Nachricht an uns bitte deine Shopware Version und die Version deines payever Plugins. Füge deiner Nachricht bitte auch die Plugin-Logs bei."
+        },
+        "downloadLog": {
+            "buttonTitle": "Protokoll herunterladen"
+        },
+        "productSynchronization": {
+            "title": "Produkt Synchronisierung",
+            "subscriptionEnableTitle": "Aktivieren",
+            "subscriptionDisableTitle": "Deaktivieren",
+            "subscriptionFailedTitle": "Abonnementvorgang kann nicht ausgeführt werden",
+            "subscriptionEnabledSuccessMessage": "Die Synchronisation wurde aktiviert",
+            "subscriptionDisabledSuccessMessage": "Die Synchronisation wurde deaktiviert",
+            "exportSuccessMessage": "Der Export von Produkten und Lagerbeständen wurde in die Warteschlange gestellt",
+            "exportButtonTitle": "Exportieren Sie Shopware-Produkte"
+        }
+    }
+}

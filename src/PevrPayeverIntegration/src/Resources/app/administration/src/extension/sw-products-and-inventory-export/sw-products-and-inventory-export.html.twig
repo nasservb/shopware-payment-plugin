@@ -1,0 +1,8 @@
+{% block sw_products_and_inventory_export %}
+<sw-button :isLoading="isLoading"
+           class="sw-products-and-inventory-buttons-export-button"
+           @click.prevent="enqueueProductsAndInventoryExport"
+           :disabled="isLoading || !isProductsSyncEnabledFilled || !isProductsOutwardSyncEnabledFilled">
+    {{ $tc('payever-plugin-config.productSynchronization.exportButtonTitle') }}
+</sw-button>
+{% endblock %}

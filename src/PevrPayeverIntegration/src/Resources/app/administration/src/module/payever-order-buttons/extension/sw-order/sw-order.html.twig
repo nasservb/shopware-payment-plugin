@@ -1,0 +1,208 @@
+{% block sw_order_detail_base_status_card %}
+    {% parent %}
+    <template>
+        <template v-if="hasPayeverPayment(order)">
+            <sw-card class="sw-order-payever-card" :title="$tc('payever-order-buttons.title')">
+                <template v-for="transaction in order.transactions">
+                    <template v-if="isPayeverPayment(transaction)">
+                        <sw-container columns="repeat(auto-fit, minmax(250px, 1fr)" gap="0 30px">
+                            <sw-description-list>
+                                <dt v-if="transaction.customFields.payever_transaction_id">
+                                    {{ $tc('payever-order-buttons.transaction') }}
+                                </dt>
+                                <dd v-if="transaction.customFields.payever_transaction_id">
+                                    {{ transaction.customFields.payever_transaction_id }}
+                                </dd>
+
+                                <dt v-if="transaction.customFields.payever_pan_id">
+                                    {{ $tc('payever-order-buttons.pan') }}
+                                </dt>
+                                <dd v-if="transaction.customFields.payever_pan_id">
+                                    {{ transaction.customFields.payever_pan_id }}
+                                </dd>
+                                {# Total amounts #}
+                                <dt v-if="paymentTotals.amount > 0">
+                                    {{ $tc('payever-order-buttons.paid') }}
+                                </dt>
+                                <dd v-if="paymentTotals.amount > 0">
+                                    {{ paymentTotals.amount | currency(order.currency.shortName) }}
+                                </dd>
+                                <dt v-if="paymentTotals.captured > 0">
+                                    {{ $tc('payever-order-buttons.captured') }}
+                                </dt>
+                                <dd v-if="paymentTotals.captured > 0">
+                                    {{ paymentTotals.captured | currency(order.currency.shortName) }}
+                                </dd>
+                                <dt v-if="paymentTotals.refunded > 0">
+                                    {{ $tc('payever-order-buttons.refunded') }}
+                                </dt>
+                                <dd v-if="paymentTotals.refunded > 0">
+                                    {{ paymentTotals.refunded | currency(order.currency.shortName) }}
+                                </dd>
+                                <dt v-if="paymentTotals.cancelled > 0">
+                                    {{ $tc('payever-order-buttons.cancelled') }}
+                                </dt>
+                                <dd v-if="paymentTotals.cancelled > 0">
+                                    {{ paymentTotals.cancelled | currency(order.currency.shortName) }}
+                                </dd>
+                            </sw-description-list>
+
+                            <sw-container gap="10px">
+                                <sw-text-field v-if="isActionPossible('shipping_goods') && isActionPossible('partialShipping') && paymentTotals.availableForCapturing > 0" :label="$tc('payever-order-buttons.shipping_goods.amount')" ref="payeverCapture" v-model="input.capture"></sw-text-field>
+                                <sw-button id="pe_ship" :isLoading="isActionLoading" v-if="isActionPossible('shipping_goods')" @click="doTransactionAction(order, transaction, 'shipping_goods')">
+                                    {{ $tc('payever-order-buttons.shipping_goods.buttonTitle') }}
+                                </sw-button>
+                                <sw-text-field v-if="isActionPossible('cancel') && isActionPossible('partialCancel') && paymentTotals.availableForCancelling > 0" :label="$tc('payever-order-buttons.cancel.amount')" ref="payeverCancel" v-model="input.cancel"></sw-text-field>
+                                <sw-button id="pe_cancel" :isLoading="isActionLoading" v-if="isActionPossible('cancel')" @click="doTransactionAction(order, transaction, 'cancel')">
+                                    {{ $tc('payever-order-buttons.cancel.buttonTitle') }}
+                                </sw-button>
+                                <sw-text-field v-if="(isActionPossible('refund') && isActionPossible('partialRefund')) && paymentTotals.availableForRefunding > 0" :label="$tc('payever-order-buttons.refund.amount')" ref="payeverRefund" v-model="input.refund"></sw-text-field>
+                                <sw-button id="pe_refund" :isLoading="isActionLoading" v-if="isActionPossible('refund') && paymentTotals.availableForRefunding > 0" @click="doTransactionAction(order, transaction, 'refund')">
+                                    {{ $tc('payever-order-buttons.refund.buttonTitle') }}
+                                </sw-button>
+                            </sw-container>
+                        </sw-container>
+
+                        {# Shipping Goods Items #}
+                        <template v-if="!isManualActionApplied() && isShippingGoodsAvailable() && isActionPossible('shipping_goods') && isActionPossible('partialShipping')">
+                            <sw-description-list>
+                                <dt>
+                                    {{ $tc('payever-order-buttons.shippingGoods.title') }}
+                                </dt>
+                                <dd></dd>
+                            </sw-description-list>
+
+                            <template v-for="item in orderItems">
+                                <sw-description-list v-if="item.can_be_captured > 0 && item.unit_price > 0">
+                                    <dt>
+                                        <sw-field type="switch"
+                                                  :label="item.label"
+                                                  ref="checkboxCapture"
+                                                  v-model="item.checked">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                    <dt class="hiddenField">
+                                        <sw-field ref="itemIdCapture"
+                                                  v-model="item.id">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                </sw-description-list>
+
+                                <sw-container gap="10px" v-if="item.can_be_captured > 0 && item.unit_price > 0">
+                                    <sw-number-field
+                                            v-show="item.item_type === 'product'"
+                                            :label="$tc('payever-order-buttons.shippingGoods.quantity')"
+                                            :min="1"
+                                            :max="item.can_be_captured"
+                                            ref="quantityCapture"
+                                            v-model="item.input.can_be_captured">
+                                    </sw-number-field>
+                                </sw-container>
+                            </template>
+
+                            <sw-container gap="10px">
+                                <sw-button id="pe_ship_item" :isLoading="isActionLoading" @click="doTransactionAction(order, transaction, 'shippingGoods')">
+                                    {{ $tc('payever-order-buttons.shippingGoods.buttonTitle') }}
+                                </sw-button>
+                            </sw-container>
+                        </template>
+
+                        {# Cancel Items #}
+                        <template v-if="!isManualActionApplied() && isCancelItemAvailable() && isActionPossible('cancel') && isActionPossible('partialCancel')">
+                            <sw-description-list>
+                                <dt>
+                                    {{ $tc('payever-order-buttons.cancelItem.title') }}
+                                </dt>
+                                <dd></dd>
+                            </sw-description-list>
+
+                            <template v-for="item in orderItems">
+                                <sw-description-list v-if="item.can_be_cancelled > 0 && item.unit_price > 0">
+                                    <dt>
+                                        <sw-field type="switch"
+                                                  :label="item.label"
+                                                  ref="checkboxCancel"
+                                                  v-model="item.checked">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                    <dt class="hiddenField">
+                                        <sw-field ref="itemIdCancel"
+                                                  v-model="item.id">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                </sw-description-list>
+
+                                <sw-container gap="10px" v-if="item.can_be_cancelled > 0 && item.unit_price > 0">
+                                    <sw-number-field
+                                            v-show="item.item_type === 'product'"
+                                            :label="$tc('payever-order-buttons.cancelItem.quantity')"
+                                            :min="1"
+                                            :max="item.can_be_cancelled"
+                                            ref="quantityCancel"
+                                            v-model="item.input.can_be_cancelled">
+                                    </sw-number-field>
+                                </sw-container>
+                            </template>
+
+                            <sw-container gap="10px">
+                                <sw-button id="pe_cancel_item" :isLoading="isActionLoading" @click="doTransactionAction(order, transaction, 'cancelItem')">
+                                    {{ $tc('payever-order-buttons.cancelItem.buttonTitle') }}
+                                </sw-button>
+                            </sw-container>
+                        </template>
+
+                        {# Refund Items #}
+                        <template v-if="!isManualActionApplied() && isRefundItemAvailable() && isActionPossible('refundItem') && isActionPossible('partialRefund')">
+                            <sw-description-list>
+                                <dt>
+                                    {{ $tc('payever-order-buttons.refundItem.title') }}
+                                </dt>
+                                <dd></dd>
+                            </sw-description-list>
+                            <template v-for="item in orderItems">
+                                <sw-description-list v-if="item.can_be_refunded > 0 && item.unit_price > 0">
+                                    <dt>
+                                        <sw-field type="switch"
+                                                  :label="item.label"
+                                                  ref="checkboxRefund"
+                                                  v-model="item.checked">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                    <dt class="hiddenField">
+                                        <sw-field ref="itemIdRefund"
+                                                  v-model="item.id">
+                                        </sw-field>
+                                    </dt>
+                                    <dd></dd>
+                                </sw-description-list>
+
+                                <sw-container gap="10px" v-if="item.can_be_refunded > 0 && item.unit_price > 0">
+                                    <sw-number-field
+                                            v-show="item.item_type === 'product'"
+                                            :label="$tc('payever-order-buttons.refundItem.quantity')"
+                                            :min="1"
+                                            :max="item.can_be_refunded"
+                                            ref="quantityRefund"
+                                            v-model="item.input.can_be_refunded">
+                                    </sw-number-field>
+                                </sw-container>
+                            </template>
+
+                            <sw-container gap="10px">
+                                <sw-button id="pe_refund_item" :isLoading="isActionLoading" @click="doTransactionAction(order, transaction, 'refundItem')">
+                                    {{ $tc('payever-order-buttons.refundItem.buttonTitle') }}
+                                </sw-button>
+                            </sw-container>
+                        </template>
+                    </template>
+                </template>
+            </sw-card>
+        </template>
+        <sw-loader v-if="isActionLoading"></sw-loader>
+    </template>
+{% endblock %}
